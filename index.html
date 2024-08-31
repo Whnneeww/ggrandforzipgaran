@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UUID Host</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
+    <style>
+        /* 隠すスタイル */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="content"></div>
+<script>
+    // ページにUUIDを生成または取得
+    let urlParams = new URLSearchParams(window.location.search);
+    let hostId = urlParams.get('id');
+
+    if (!hostId) {
+        // UUIDを生成し、クエリパラメータに追加
+        hostId = uuid.v4();
+        window.history.replaceState(null, '', '?id=' + hostId);
+
+        // HTMLをアップロードするロジックをここに追加
+        console.log('新しいUUIDを生成:', hostId);
+        // アップロード処理やホスト登録処理をここに書く
+    } else {
+        // 既存のIDでWebSocket接続を開始
+        console.log('UUIDが見つかりました:', hostId);
+
+        const ws = new WebSocket('wss://your-websocket-server-url');
+
+        ws.onopen = function() {
+            console.log('WebSocket接続が開かれました');
+            // IDに基づいてファイルをリクエストするロジックをここに追加
+        };
+
+        ws.onmessage = function(event) {
+            console.log('ファイルを受信:', event.data);
+            document.getElementById('content').innerHTML = event.data;
+
+            // アップロードボタンなどを隠す処理
+            // document.getElementById('uploadButton').classList.add('hidden');
+        };
+
+        ws.onerror = function(error) {
+            console.error('WebSocketエラー:', error);
+        };
+
+        ws.onclose = function() {
+            console.log('WebSocket接続が閉じられました');
+        };
+    }
+</script>
+
+</body>
+</html>
